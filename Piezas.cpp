@@ -22,6 +22,13 @@
 **/
 Piezas::Piezas()
 {
+    turn = X;
+    board.resize(BOARD_ROWS, std::vector<Piece>(BOARD_COLS));
+    for(int i = 0; i<BOARD_ROWS; i++){
+        for(int j = 0; j<BOARD_COLS; j++){
+            board[i][j] = Blank;
+        }
+    }  
 }
 
 /**
@@ -30,6 +37,11 @@ Piezas::Piezas()
 **/
 void Piezas::reset()
 {
+    for(int i = 0; i<BOARD_ROWS; i++){
+        for(int j = 0; j<BOARD_COLS; j++){
+            board[i][j] = Blank;
+        }
+    }
 }
 
 /**
@@ -42,7 +54,31 @@ void Piezas::reset()
 **/ 
 Piece Piezas::dropPiece(int column)
 {
-    return Blank;
+    if(column < BOARD_COLS){
+        for(int i = 0; i < BOARD_ROWS; i++){
+            if(board[i][column] == Blank){
+                if(turn == X){
+                    turn = O;
+                    board[i][column] = X;
+                    return X;
+                }
+                else{
+                    turn = X;
+                    board[i][column] = O;
+                    return O;
+                }
+            }
+        }
+        if(turn == X){
+            turn = O;
+        }
+        else{
+            turn = X;
+        }
+        return Blank;
+        
+    }
+    return Invalid;
 }
 
 /**
@@ -51,7 +87,10 @@ Piece Piezas::dropPiece(int column)
 **/
 Piece Piezas::pieceAt(int row, int column)
 {
-    return Blank;
+    if((row < BOARD_ROWS) && (column < BOARD_COLS)){
+        return board[row][column];
+    }
+    return Invalid;
 }
 
 /**
@@ -65,5 +104,94 @@ Piece Piezas::pieceAt(int row, int column)
 **/
 Piece Piezas::gameState()
 {
-    return Blank;
+    int max_x = 0;
+    int max_o = 0;
+    int tmp_x = 0;
+    int tmp_o = 0;
+
+    //checking for blank space
+    for(int i = 0; i<BOARD_ROWS; i++){
+        for(int j = 0; j<BOARD_COLS; j++){
+            if(board[i][j] == Blank){
+                return Invalid;
+            }
+        }
+    }
+
+    //checking max x in rows
+    for(int i = 0; i<BOARD_ROWS; i++){
+        for(int j = 0; j<BOARD_COLS; j++){
+            if(board[i][j] == X){
+                tmp_x++;
+            }
+            else{
+                tmp_x = 0;
+            }
+        }
+        if(max_x < tmp_x){
+            max_x = tmp_x;
+        }
+        tmp_x = 0; //reset for new row
+    }
+    //checking max x in columns
+    if(max_x < 4){
+        for(int i = 0; i<BOARD_COLS; i++){
+            for(int j = 0; j<BOARD_ROWS; j++){
+                if(board[j][i] == X){
+                    tmp_x++;
+                }
+                else{
+                  tmp_x = 0;
+                }
+            }
+            if(max_x < tmp_x){
+                max_x = tmp_x;
+            }
+            tmp_x = 0; //reset for new column
+        }
+    }
+
+    //checking max o in rows
+    for(int i = 0; i<BOARD_ROWS; i++){
+        for(int j = 0; j<BOARD_COLS; j++){
+            if(board[i][j] == O){
+                tmp_o++;
+            }
+            else{
+                tmp_o = 0;
+            }
+        }
+        if(max_o < tmp_o){
+            max_o = tmp_o;
+        }
+        tmp_o = 0; //reset for new row
+    }
+    //checking max o in columns
+    if(max_o < 4){
+        for(int i = 0; i<BOARD_COLS; i++){
+            for(int j = 0; j<BOARD_ROWS; j++){
+                if(board[j][i] == O){
+                    tmp_o++;
+                }
+                else{
+                  tmp_o = 0;
+                }
+            }
+            if(max_o < tmp_o){
+                max_o = tmp_o;
+            }
+            tmp_o = 0; //reset for new column
+        }
+    }
+
+    //return winner
+    if(max_x == max_o){
+        return Blank;
+    }
+    else if(max_x > max_o){
+        return X;
+    }
+    else{
+        return O;
+    }
 }
